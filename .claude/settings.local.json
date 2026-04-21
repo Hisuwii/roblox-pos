@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm create *)",
+      "PowerShell(Get-Command npm -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-Command node -ErrorAction SilentlyContinue)",
+      "PowerShell(Get-ChildItem \"C:\\\\Program Files\\\\nodejs\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:APPDATA\\\\npm\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:LOCALAPPDATA\\\\Programs\\\\nodejs\" -ErrorAction SilentlyContinue)",
+      "PowerShell(Set-Location \"C:\\\\Users\\\\quila\\\\OneDrive\\\\Documents\\\\financial\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" create vite@latest . -- --template react 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\Users\\\\quila\\\\OneDrive\\\\Documents\\\\financial\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" create vite@latest . -- --template react 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\Users\\\\quila\\\\OneDrive\\\\Documents\\\\financial\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" install 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\Users\\\\quila\\\\OneDrive\\\\Documents\\\\financial\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" run dev 2>&1)",
+      "PowerShell($env:PATH = \"C:\\\\Program Files\\\\nodejs;\" + $env:PATH; Set-Location \"C:\\\\Users\\\\quila\\\\OneDrive\\\\Documents\\\\financial\"; & \"C:\\\\Program Files\\\\nodejs\\\\npm.cmd\" install lucide-react 2>&1)"
+    ]
+  }
+}
