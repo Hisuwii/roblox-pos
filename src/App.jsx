@@ -26,10 +26,8 @@ export default function App() {
         }}
       />
 
-      {/* Sidebar */}
-      <aside className="w-56 flex-shrink-0 flex flex-col" style={{ background: '#0e0e1a', borderRight: '1px solid #1c1c2e' }}>
-
-        {/* Logo */}
+      {/* Sidebar — desktop only */}
+      <aside className="hidden lg:flex w-56 flex-shrink-0 flex-col" style={{ background: '#0e0e1a', borderRight: '1px solid #1c1c2e' }}>
         <div className="px-4 py-5 flex items-center gap-3" style={{ borderBottom: '1px solid #1c1c2e' }}>
           <div className="relative">
             <img src={robloxLogo} alt="Roblox" className="w-9 h-9 rounded-xl object-contain" />
@@ -41,7 +39,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-5 flex flex-col gap-0.5">
           <p className="text-xs font-semibold uppercase tracking-widest px-3 mb-3" style={{ color: '#3d3d60' }}>Menu</p>
           {TABS.map(({ id, label, Icon }) => {
@@ -50,18 +47,11 @@ export default function App() {
               <button
                 key={id}
                 onClick={() => setActiveTab(id)}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative overflow-hidden ${
-                  isActive ? 'text-violet-300' : 'text-slate-500 hover:text-slate-200'
-                }`}
-                style={isActive ? { background: '#1c1c2e' } : {}}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all group relative"
+                style={isActive ? { background: '#1c1c2e', color: '#c4b5fd' } : { color: '#6b7280' }}
               >
-                {isActive && (
-                  <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-violet-500" />
-                )}
-                <Icon
-                  size={16}
-                  className={isActive ? 'text-violet-400' : 'text-slate-600 group-hover:text-slate-400'}
-                />
+                {isActive && <span className="absolute left-0 top-2 bottom-2 w-0.5 rounded-r-full bg-violet-500" />}
+                <Icon size={16} style={{ color: isActive ? '#a78bfa' : '#4b5563' }} />
                 <span className="flex-1 text-left">{label}</span>
                 {isActive && <ChevronRight size={13} className="text-violet-500" />}
               </button>
@@ -69,30 +59,49 @@ export default function App() {
           })}
         </nav>
 
-        {/* Footer */}
         <div className="px-4 py-4" style={{ borderTop: '1px solid #1c1c2e' }}>
           <p className="text-xs text-center" style={{ color: '#2e2e4a' }}>v1.0</p>
         </div>
       </aside>
 
       {/* Main */}
-      <main className="flex-1 flex flex-col overflow-hidden">
+      <main className="flex-1 flex flex-col overflow-hidden min-w-0">
         {/* Topbar */}
-        <header
-          className="h-14 flex items-center px-6 gap-3 flex-shrink-0"
-          style={{ background: '#0e0e1a', borderBottom: '1px solid #1c1c2e' }}
-        >
-          {active && <active.Icon size={16} className="text-violet-400" />}
+        <header className="h-14 flex items-center px-4 gap-3 flex-shrink-0" style={{ background: '#0e0e1a', borderBottom: '1px solid #1c1c2e' }}>
+          <img src={robloxLogo} alt="Roblox" className="w-7 h-7 rounded-lg object-contain lg:hidden" />
+          {active && <active.Icon size={16} className="text-violet-400 hidden lg:block" />}
           <h1 className="text-white font-semibold text-sm">{active?.label}</h1>
         </header>
 
-        {/* Page */}
-        <div className="flex-1 overflow-auto p-5">
+        {/* Page — leave room for bottom nav on mobile */}
+        <div className="flex-1 overflow-auto p-4 lg:p-5 pb-20 lg:pb-5">
           {activeTab === 'catalog'   && <ItemCatalog />}
           {activeTab === 'pos'       && <POSScreen />}
           {activeTab === 'dashboard' && <Dashboard />}
         </div>
       </main>
+
+      {/* Bottom nav — mobile only */}
+      <nav
+        className="lg:hidden fixed bottom-0 left-0 right-0 flex z-40"
+        style={{ background: '#0e0e1a', borderTop: '1px solid #1c1c2e' }}
+      >
+        {TABS.map(({ id, label, Icon }) => {
+          const isActive = activeTab === id
+          return (
+            <button
+              key={id}
+              onClick={() => setActiveTab(id)}
+              className="flex-1 flex flex-col items-center justify-center py-3 gap-1 transition-colors"
+              style={{ color: isActive ? '#a78bfa' : '#4b5563' }}
+            >
+              <Icon size={20} />
+              <span className="text-[10px] font-medium">{label.split(' /')[0]}</span>
+              {isActive && <span className="absolute bottom-0 w-8 h-0.5 rounded-full bg-violet-500" />}
+            </button>
+          )
+        })}
+      </nav>
     </div>
   )
 }

@@ -90,7 +90,7 @@ export default function ItemCatalog() {
       </div>
 
       {/* Game filter tabs */}
-      <div className="flex gap-2 mb-5 flex-wrap">
+      <div className="flex gap-2 mb-5 overflow-x-auto pb-1 scrollbar-none" style={{ scrollbarWidth: 'none' }}>
         {['All', ...GAMES].map((game) => {
           const active = gameFilter === game
           const count = game === 'All' ? items.length : items.filter((i) => i.category === game).length
@@ -98,7 +98,7 @@ export default function ItemCatalog() {
             <button
               key={game}
               onClick={() => setGameFilter(game)}
-              className="px-4 py-2 rounded-xl text-sm font-medium transition-all"
+              className="px-4 py-2 rounded-xl text-sm font-medium transition-all flex-shrink-0"
               style={{
                 background: active ? '#1c1c2e' : 'transparent',
                 border: active ? '1px solid #7c3aed' : '1px solid #24243c',
