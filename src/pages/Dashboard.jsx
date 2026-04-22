@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { TrendingUp, TrendingDown, Wallet, Plus, Trash2, Receipt, CreditCard } from 'lucide-react'
+import { TrendingUp, TrendingDown, Wallet, Plus, Trash2, Receipt, CreditCard, Calendar } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const EMPTY_EXPENSE = { amount: '', reason: '', date: new Date().toISOString().slice(0, 10) }
@@ -60,12 +60,17 @@ export default function Dashboard() {
   const totalSpent  = expenses.reduce((s, e) => s + e.amount, 0)
   const net = totalEarned - totalSpent
 
+  const startOfToday = new Date(); startOfToday.setHours(0, 0, 0, 0)
+  const todaysTx = transactions.filter((t) => new Date(t.date) >= startOfToday)
+  const todaysEarned = todaysTx.reduce((s, t) => s + t.total, 0)
+
   if (loading) return <div className="flex items-center justify-center h-64 text-slate-600">Loading...</div>
 
   return (
     <div className="flex flex-col gap-6">
       {/* Stat cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <StatCard label="Today" value={`₱${todaysEarned.toLocaleString()}`} sub={`${todaysTx.length} sale${todaysTx.length === 1 ? '' : 's'}`} Icon={Calendar} accent="#06b6d4" accentBg="#082f3a" />
         <StatCard label="Total Earned" value={`₱${totalEarned.toLocaleString()}`} sub={`${transactions.length} sales`} Icon={TrendingUp} accent="#10b981" accentBg="#052e16" />
         <StatCard label="Total Spent"  value={`₱${totalSpent.toLocaleString()}`}  sub={`${expenses.length} expenses`} Icon={TrendingDown} accent="#f43f5e" accentBg="#1c0a0a" />
         <StatCard
@@ -128,7 +133,7 @@ export default function Dashboard() {
                       <td className="px-4 py-3 text-slate-500 text-xs">{tx.items?.category ?? '—'}</td>
                       <td className="px-4 py-3 text-slate-400">{tx.qty_sold}</td>
                       <td className="px-4 py-3 font-semibold" style={{ color: '#10b981' }}>+₱{tx.total.toLocaleString()}</td>
-                      <td className="px-4 py-3 text-slate-600 text-xs">{new Date(tx.date).toLocaleDateString()}</td>
+                      <td className="px-4 py-3 text-slate-600 text-xs">{fmtDateTime(tx.date)}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs max-w-[120px] truncate">{tx.notes ?? '—'}</td>
                     </tr>
                   ))}
@@ -205,6 +210,10 @@ function StatCard({ label, value, sub, Icon, accent, accentBg }) {
       <p className="text-xs text-slate-600">{sub}</p>
     </div>
   )
+}
+
+function fmtDateTime(d) {
+  return new Date(d).toLocaleString([], { month: 'numeric', day: 'numeric', year: '2-digit', hour: 'numeric', minute: '2-digit' })
 }
 
 function EmptyState({ icon, text }) {

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import toast from 'react-hot-toast'
-import { Plus, Pencil, Trash2, Package } from 'lucide-react'
+import { Plus, Pencil, Trash2, Package, PackagePlus } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 
 const GAMES = ['Blox Fruit', 'Steal a Brainrot', 'Other']
@@ -23,6 +23,8 @@ export default function ItemCatalog() {
   const [saving, setSaving] = useState(false)
   const [deleteConfirm, setDeleteConfirm] = useState(null)
   const [gameFilter, setGameFilter] = useState('All')
+  const [restockItem, setRestockItem] = useState(null)
+  const [restockAmount, setRestockAmount] = useState('1')
 
   useEffect(() => {
     fetchItems()
@@ -59,6 +61,21 @@ export default function ItemCatalog() {
     if (error) return toast.error('Save failed: ' + error.message)
     toast.success(editing ? 'Item updated' : 'Item added')
     setModalOpen(false)
+  }
+
+  async function handleRestock() {
+    const add = parseInt(restockAmount, 10)
+    if (isNaN(add) || add <= 0) return toast.error('Enter a valid amount')
+    const max = MAX_QTY[restockItem.category]
+    let newQty = restockItem.qty + add
+    if (max && newQty > max) {
+      toast.error(`Capped at ${max} for ${restockItem.category}`)
+      newQty = max
+    }
+    const { error } = await supabase.from('items').update({ qty: newQty }).eq('id', restockItem.id)
+    if (error) return toast.error('Restock failed: ' + error.message)
+    toast.success(`+${newQty - restockItem.qty} ${restockItem.name}`)
+    setRestockItem(null); setRestockAmount('1')
   }
 
   async function handleDelete(id) {
@@ -149,11 +166,14 @@ export default function ItemCatalog() {
                   }`}>{item.qty} left</span>
                 </div>
                 <div className="flex gap-1.5">
-                  <button onClick={() => openEdit(item)} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition-colors" style={{ background: '#1c1c2e' }}>
-                    <Pencil size={11} /> Edit
+                  <button onClick={() => { setRestockItem(item); setRestockAmount('1') }} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-medium text-violet-400 hover:text-violet-300 transition-colors" style={{ background: '#1a1438' }}>
+                    <PackagePlus size={11} /> Stock
                   </button>
-                  <button onClick={() => setDeleteConfirm(item)} className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg text-xs font-medium text-red-500 hover:text-red-300 transition-colors" style={{ background: '#1c0a0a' }}>
-                    <Trash2 size={11} /> Delete
+                  <button onClick={() => openEdit(item)} className="flex items-center justify-center px-2 py-1.5 rounded-lg text-slate-400 hover:text-white transition-colors" style={{ background: '#1c1c2e' }} title="Edit">
+                    <Pencil size={11} />
+                  </button>
+                  <button onClick={() => setDeleteConfirm(item)} className="flex items-center justify-center px-2 py-1.5 rounded-lg text-red-500 hover:text-red-300 transition-colors" style={{ background: '#1c0a0a' }} title="Delete">
+                    <Trash2 size={11} />
                   </button>
                 </div>
               </div>
@@ -200,6 +220,38 @@ export default function ItemCatalog() {
             <button onClick={handleSave} disabled={saving} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white disabled:opacity-40 transition-opacity" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>
               {saving ? 'Saving...' : editing ? 'Update' : 'Add Item'}
             </button>
+          </div>
+        </Overlay>
+      )}
+
+      {/* Restock Modal */}
+      {restockItem && (
+        <Overlay onClose={() => setRestockItem(null)} small>
+          <div className="text-center">
+            <div className="w-12 h-12 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: '#1a1438' }}>
+              <PackagePlus size={20} className="text-violet-400" />
+            </div>
+            <h3 className="text-white font-bold mb-1">Restock {restockItem.name}</h3>
+            <p className="text-slate-500 text-sm mb-5">
+              Current: <span className="text-white font-semibold">{restockItem.qty}</span>
+              {MAX_QTY[restockItem.category] && <span className="text-slate-600"> / max {MAX_QTY[restockItem.category]}</span>}
+            </p>
+            <div className="text-left">
+              <label className="text-slate-500 text-xs font-medium block mb-1.5">Add how many?</label>
+              <input
+                type="number" min="1" autoFocus
+                style={S.input}
+                value={restockAmount}
+                onChange={(e) => setRestockAmount(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleRestock()}
+                onFocus={(e) => (e.target.style.borderColor = '#7c3aed')}
+                onBlur={(e) => (e.target.style.borderColor = '#2e2e4a')}
+              />
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button onClick={() => setRestockItem(null)} className="flex-1 py-2.5 rounded-xl text-sm font-medium text-slate-300" style={{ background: '#1c1c2e' }}>Cancel</button>
+              <button onClick={handleRestock} className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white" style={{ background: 'linear-gradient(135deg, #7c3aed, #6366f1)' }}>Add Stock</button>
+            </div>
           </div>
         </Overlay>
       )}
