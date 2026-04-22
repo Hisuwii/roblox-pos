@@ -160,8 +160,15 @@ export default function Dashboard() {
                       <td className="px-4 py-3 text-slate-600 text-xs">{fmtDateTime(tx.date)}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs max-w-[120px] truncate">{tx.notes ?? '—'}</td>
                       <td className="px-4 py-3">
-                        <button onClick={() => deleteTransaction(tx)} className="text-slate-700 hover:text-red-400 transition-colors" title="Delete & restore stock">
-                          <Trash2 size={13} />
+                        <button
+                          onClick={() => deleteTransaction(tx)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-300 hover:text-white transition-all"
+                          style={{ background: '#3a0a0a', border: '1px solid #7f1d1d' }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = '#991b1b')}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = '#3a0a0a')}
+                          title="Delete & restore stock"
+                        >
+                          <Trash2 size={12} /> Delete
                         </button>
                       </td>
                     </tr>
@@ -187,7 +194,15 @@ export default function Dashboard() {
                       <td className="px-4 py-3 font-semibold" style={{ color: '#f43f5e' }}>−₱{exp.amount.toLocaleString()}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs">{new Date(exp.date).toLocaleDateString()}</td>
                       <td className="px-4 py-3">
-                        <button onClick={() => deleteExpense(exp.id)} className="text-slate-700 hover:text-red-400 transition-colors"><Trash2 size={13} /></button>
+                        <button
+                          onClick={() => deleteExpense(exp.id)}
+                          className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-300 hover:text-white transition-all"
+                          style={{ background: '#3a0a0a', border: '1px solid #7f1d1d' }}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = '#991b1b')}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = '#3a0a0a')}
+                        >
+                          <Trash2 size={12} /> Delete
+                        </button>
                       </td>
                     </tr>
                   ))}
