@@ -56,6 +56,30 @@ export default function Dashboard() {
     else toast.success('Deleted')
   }
 
+  async function deleteTransaction(tx) {
+    if (!confirm(`Delete this sale and restore ${tx.qty_sold}× ${tx.items?.name ?? 'item'} back to stock?`)) return
+
+    // Delete the transaction
+    const { error: delErr } = await supabase.from('transactions').delete().eq('id', tx.id)
+    if (delErr) return toast.error('Delete failed: ' + delErr.message)
+
+    // Restore stock if item still exists
+    if (tx.item_id) {
+      const { data: item } = await supabase.from('items').select('qty, category').eq('id', tx.item_id).single()
+      if (item) {
+        const MAX = { 'Blox Fruit': 4 }
+        const max = MAX[item.category]
+        let newQty = item.qty + tx.qty_sold
+        if (max && newQty > max) {
+          newQty = max
+          toast(`Stock capped at ${max} for ${item.category}`, { icon: '⚠️' })
+        }
+        await supabase.from('items').update({ qty: newQty }).eq('id', tx.item_id)
+      }
+    }
+    toast.success('Sale deleted, stock restored')
+  }
+
   const totalEarned = transactions.reduce((s, t) => s + t.total, 0)
   const totalSpent  = expenses.reduce((s, e) => s + e.amount, 0)
   const net = totalEarned - totalSpent
@@ -119,8 +143,8 @@ export default function Dashboard() {
             ? <EmptyState icon={<Receipt size={36} />} text="No sales recorded yet" />
             : <table className="w-full text-sm">
                 <thead><tr style={{ borderBottom: '1px solid #1c1c2e' }}>
-                  {['Item', 'Game', 'Qty', 'Total', 'Date', 'Notes'].map((h) => (
-                    <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: '#3d3d60' }}>{h}</th>
+                  {['Item', 'Game', 'Qty', 'Total', 'Date', 'Notes', ''].map((h, i) => (
+                    <th key={i} className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: '#3d3d60' }}>{h}</th>
                   ))}
                 </tr></thead>
                 <tbody>
@@ -135,6 +159,11 @@ export default function Dashboard() {
                       <td className="px-4 py-3 font-semibold" style={{ color: '#10b981' }}>+₱{tx.total.toLocaleString()}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs">{fmtDateTime(tx.date)}</td>
                       <td className="px-4 py-3 text-slate-600 text-xs max-w-[120px] truncate">{tx.notes ?? '—'}</td>
+                      <td className="px-4 py-3">
+                        <button onClick={() => deleteTransaction(tx)} className="text-slate-700 hover:text-red-400 transition-colors" title="Delete & restore stock">
+                          <Trash2 size={13} />
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
