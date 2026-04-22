@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { Toaster } from 'react-hot-toast'
-import { Package, ShoppingCart, LayoutDashboard, ChevronRight } from 'lucide-react'
+import { Toaster, toast, ToastBar } from 'react-hot-toast'
+import { Package, ShoppingCart, LayoutDashboard, ChevronRight, X } from 'lucide-react'
 import ItemCatalog from './pages/ItemCatalog'
 import POSScreen from './pages/POSScreen'
 import Dashboard from './pages/Dashboard'
@@ -21,10 +21,30 @@ export default function App() {
       <Toaster
         position="top-right"
         toastOptions={{
-          style: { background: '#141422', color: '#e8e8f0', border: '1px solid #2e2e4a', borderRadius: '12px' },
+          duration: 3500,
+          style: { background: '#141422', color: '#e8e8f0', border: '1px solid #2e2e4a', borderRadius: '12px', padding: '4px 8px 4px 12px' },
           success: { iconTheme: { primary: '#8b5cf6', secondary: '#07070f' } },
         }}
-      />
+      >
+        {(t) => (
+          <ToastBar toast={t}>
+            {({ icon, message }) => (
+              <>
+                {icon}
+                {message}
+                {t.type !== 'loading' && (
+                  <button
+                    onClick={() => toast.dismiss(t.id)}
+                    className="ml-1 p-1 rounded-md hover:bg-white/10 transition-colors text-slate-400 hover:text-white flex-shrink-0"
+                  >
+                    <X size={14} />
+                  </button>
+                )}
+              </>
+            )}
+          </ToastBar>
+        )}
+      </Toaster>
 
       {/* Sidebar — desktop only */}
       <aside className="hidden lg:flex w-56 flex-shrink-0 flex-col" style={{ background: '#0e0e1a', borderRight: '1px solid #1c1c2e' }}>

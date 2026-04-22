@@ -44,7 +44,7 @@ export default function POSScreen() {
       const existing = prev.find((c) => c.id === item.id)
       if (existing) {
         if (existing.qty >= item.qty) {
-          toast.error(`Only ${item.qty} ${item.name} in stock`)
+          toast.error(`Only ${item.qty} ${item.name} in stock`, { id: `stock-${item.id}` })
           return prev
         }
         return prev.map((c) => c.id === item.id ? { ...c, qty: c.qty + 1 } : c)
@@ -255,7 +255,13 @@ function CartPanel({ cart, notes, setNotes, selling, grandTotal, onUpdate, onRem
             {cart.length > 0 && <span className="text-violet-400 text-xs">({cart.length})</span>}
           </span>
           {cart.length > 0 && (
-            <button onClick={onClear} className="text-slate-600 hover:text-red-400 text-xs flex items-center gap-1 transition-colors">
+            <button
+              onClick={onClear}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-semibold text-red-300 hover:text-white transition-all"
+              style={{ background: '#3a0a0a', border: '1px solid #7f1d1d' }}
+              onMouseEnter={(e) => (e.currentTarget.style.background = '#991b1b')}
+              onMouseLeave={(e) => (e.currentTarget.style.background = '#3a0a0a')}
+            >
               <Trash2 size={11} /> Clear
             </button>
           )}
@@ -275,9 +281,16 @@ function CartPanel({ cart, notes, setNotes, selling, grandTotal, onUpdate, onRem
                 const lineTotal = (parseFloat(c.price) || 0) * (parseInt(c.qty) || 0)
                 return (
                   <div key={c.id} className="rounded-xl p-2.5" style={Sx.elevated}>
-                    <div className="flex justify-between items-start gap-2 mb-1.5">
-                      <p className="text-white text-xs font-semibold truncate">{c.name}</p>
-                      <button onClick={() => onRemove(c.id)} className="text-slate-600 hover:text-red-400 transition-colors flex-shrink-0">
+                    <div className="flex justify-between items-center gap-2 mb-2">
+                      <p className="text-white text-xs font-semibold truncate flex-1">{c.name}</p>
+                      <button
+                        onClick={() => onRemove(c.id)}
+                        className="flex items-center justify-center w-6 h-6 rounded-md text-red-300 hover:text-white transition-all flex-shrink-0"
+                        style={{ background: '#3a0a0a', border: '1px solid #7f1d1d' }}
+                        onMouseEnter={(e) => (e.currentTarget.style.background = '#991b1b')}
+                        onMouseLeave={(e) => (e.currentTarget.style.background = '#3a0a0a')}
+                        title="Remove from cart"
+                      >
                         <X size={13} />
                       </button>
                     </div>
