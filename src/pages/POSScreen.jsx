@@ -113,7 +113,9 @@ export default function POSScreen() {
     setCart([]); setNotes(''); setMobileCartOpen(false)
   }
 
-  const filtered = items.filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+  const filtered = items
+    .filter((i) => i.name.toLowerCase().includes(search.toLowerCase()))
+    .sort((a, b) => (b.qty > 0) - (a.qty > 0))
   const grandTotal = cart.reduce((s, c) => s + (parseFloat(c.price) || 0) * (parseInt(c.qty) || 0), 0)
   const cartCount = cart.reduce((s, c) => s + (parseInt(c.qty) || 0), 0)
 
